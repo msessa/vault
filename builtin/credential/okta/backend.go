@@ -3,6 +3,7 @@ package okta
 import (
 	"fmt"
 
+	"github.com/fatih/structs"
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
 )
@@ -67,9 +68,26 @@ func (b *backend) Login(req *logical.Request, username string, password string) 
 		b.Logger().Debug("auth/okta: Groups fetched from Okta", "num_groups", len(oktaGroups), "groups", oktaGroups)
 	}
 
+	oktaUserProfile, err := b.getOktaUserProfile(cfg, auth.Embedded.User.ID)
+	if err != nil {
+		return nil, logical.ErrorResponse(err.Error()), nil
+	}
+	if b.Logger().IsDebug() {
+		b.Logger().Debug("auth/okta: Profile fetched from Okta: %v", oktaUserProfile)
+	}
+
+	authUserProfile := make(map[string]string)
+	for k, v := range structs.Map(auth.Embedded.User.Profile) {
+		authUserProfile[k] = v.(string)
+	}
+
 	oktaResponse := &logical.Response{
 		Data: map[string]interface{}{},
 	}
+
+	oktaResponse.Data["authprofile"] = authUserProfile
+	oktaResponse.Data["userprofile"] = oktaUserProfile
+
 	if len(oktaGroups) == 0 {
 		errString := fmt.Sprintf(
 			"no Okta groups found; only policies from locally-defined groups available")
@@ -113,6 +131,23 @@ func (b *backend) Login(req *logical.Request, username string, password string) 
 	}
 
 	return policies, oktaResponse, nil
+}
+
+func (b *backend) getOktaUserProfile(cfg *ConfigEntry, userID string) (map[string]string, error) {
+	if cfg.Token != "" {
+		client := cfg.OktaClient()
+		user, err := client.User(userID)
+		if err != nil {
+			return nil, err
+		}
+
+		oktaUserProfile := make(map[string]string)
+		for k, v := range structs.Map(user.Profile) {
+			oktaUserProfile[k] = v.(string)
+		}
+		return oktaUserProfile, err
+	}
+	return nil, nil
 }
 
 func (b *backend) getOktaGroups(cfg *ConfigEntry, userID string) ([]string, error) {

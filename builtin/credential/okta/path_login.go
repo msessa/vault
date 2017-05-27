@@ -69,6 +69,20 @@ func (b *backend) pathLogin(
 			Renewable: true,
 		},
 	}
+	if profile, ok := resp.Data["authprofile"]; ok {
+		for k, v := range profile.(map[string]string) {
+			if len(v) > 0 {
+				resp.Auth.Metadata[k] = v
+			}
+		}
+	}
+	if profile, ok := resp.Data["userprofile"]; ok {
+		for k, v := range profile.(map[string]string) {
+			if len(v) > 0 {
+				resp.Auth.Metadata[k] = v
+			}
+		}
+	}
 	return resp, nil
 }
 
