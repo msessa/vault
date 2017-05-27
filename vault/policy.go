@@ -74,6 +74,7 @@ type PathCapabilities struct {
 	MaxWrappingTTLHCL    interface{}              `hcl:"max_wrapping_ttl"`
 	AllowedParametersHCL map[string][]interface{} `hcl:"allowed_parameters"`
 	DeniedParametersHCL  map[string][]interface{} `hcl:"denied_parameters"`
+	Template             bool                     `hcl:"template"`
 }
 
 type Permissions struct {
@@ -139,6 +140,7 @@ func parsePaths(result *Policy, list *ast.ObjectList) error {
 			"denied_parameters",
 			"min_wrapping_ttl",
 			"max_wrapping_ttl",
+			"template",
 		}
 		if err := checkHCLKeys(item.Val, valid); err != nil {
 			return multierror.Prefix(err, fmt.Sprintf("path %q:", key))

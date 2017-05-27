@@ -331,7 +331,7 @@ func (ps *PolicyStore) DeletePolicy(name string) error {
 
 // ACL is used to return an ACL which is built using the
 // named policies.
-func (ps *PolicyStore) ACL(names ...string) (*ACL, error) {
+func (ps *PolicyStore) ACL(names []string, token *TokenEntry) (*ACL, error) {
 	// Fetch the policies
 	var policy []*Policy
 	for _, name := range names {
@@ -343,7 +343,7 @@ func (ps *PolicyStore) ACL(names ...string) (*ACL, error) {
 	}
 
 	// Construct the ACL
-	acl, err := NewACL(policy)
+	acl, err := NewACL(policy, token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct ACL: %v", err)
 	}

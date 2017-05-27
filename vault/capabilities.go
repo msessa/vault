@@ -41,7 +41,7 @@ func (c *Core) Capabilities(token, path string) ([]string, error) {
 		return []string{DenyCapability}, nil
 	}
 
-	acl, err := NewACL(policies)
+	acl, err := NewACL(policies, te)
 	if err != nil {
 		return nil, err
 	}

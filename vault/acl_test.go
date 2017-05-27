@@ -11,7 +11,7 @@ import (
 func TestACL_Capabilities(t *testing.T) {
 	// Create the root policy ACL
 	policy := []*Policy{&Policy{Name: "root"}}
-	acl, err := NewACL(policy)
+	acl, err := NewACL(policy, nil)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
@@ -27,7 +27,7 @@ func TestACL_Capabilities(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	acl, err = NewACL([]*Policy{policies})
+	acl, err = NewACL([]*Policy{policies}, nil)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
@@ -55,7 +55,7 @@ func TestACL_Capabilities(t *testing.T) {
 func TestACL_Root(t *testing.T) {
 	// Create the root policy ACL
 	policy := []*Policy{&Policy{Name: "root"}}
-	acl, err := NewACL(policy)
+	acl, err := NewACL(policy, nil)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
@@ -78,7 +78,7 @@ func TestACL_Single(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	acl, err := NewACL([]*Policy{policy})
+	acl, err := NewACL([]*Policy{policy}, nil)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
@@ -148,7 +148,7 @@ func TestACL_Layered(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	acl, err := NewACL([]*Policy{policy1, policy2})
+	acl, err := NewACL([]*Policy{policy1, policy2}, nil)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
@@ -220,7 +220,7 @@ func TestACL_PolicyMerge(t *testing.T) {
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
-	acl, err := NewACL([]*Policy{policy})
+	acl, err := NewACL([]*Policy{policy}, nil)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
@@ -276,7 +276,7 @@ func TestACL_AllowOperation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
-	acl, err := NewACL([]*Policy{policy})
+	acl, err := NewACL([]*Policy{policy}, nil)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
@@ -346,7 +346,7 @@ func TestACL_ValuePermissions(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	acl, err := NewACL([]*Policy{policy})
+	acl, err := NewACL([]*Policy{policy}, nil)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}

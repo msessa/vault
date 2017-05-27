@@ -1,8 +1,10 @@
 package vault
 
 import (
+	"bytes"
 	"reflect"
 	"strings"
+	"text/template"
 
 	"github.com/armon/go-radix"
 	"github.com/hashicorp/vault/helper/strutil"
@@ -23,7 +25,7 @@ type ACL struct {
 }
 
 // New is used to construct a policy based ACL from a set of policies.
-func NewACL(policies []*Policy) (*ACL, error) {
+func NewACL(policies []*Policy, token *TokenEntry) (*ACL, error) {
 	// Initialize
 	a := &ACL{
 		exactRules: radix.New(),
@@ -48,10 +50,31 @@ func NewACL(policies []*Policy) (*ACL, error) {
 				tree = a.globRules
 			}
 
+			var prefix string
+			if pc.Template && token != nil {
+				t, err := template.New("").Option("missingkey=error").Parse(pc.Prefix)
+				// Ignore entry if error. Should this return err instead?
+				if err != nil {
+					continue
+				}
+				var doc bytes.Buffer
+				err = t.Execute(&doc, token)
+				// Ignore entry if error. Should this return err instead?
+				if err != nil {
+					continue
+				}
+				prefix = doc.String()
+				t = nil
+				// No access to logger from here :( Would be nice to have this info at TRACE loglevel
+				//fmt.Printf("Processed template="%v", result="%v"\n", pc.Prefix, prefix)
+			} else {
+				prefix = pc.Prefix
+			}
+
 			// Check for an existing policy
-			raw, ok := tree.Get(pc.Prefix)
+			raw, ok := tree.Get(prefix)
 			if !ok {
-				tree.Insert(pc.Prefix, pc.Permissions)
+				tree.Insert(prefix, pc.Permissions)
 				continue
 			}
 

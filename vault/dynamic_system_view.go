@@ -37,7 +37,7 @@ func (d dynamicSystemView) SudoPrivilege(path string, token string) bool {
 	}
 
 	// Construct the corresponding ACL object
-	acl, err := d.core.policyStore.ACL(te.Policies...)
+	acl, err := d.core.policyStore.ACL(te.Policies, te)
 	if err != nil {
 		d.core.logger.Error("failed to retrieve ACL for token's policies", "token_policies", te.Policies, "error", err)
 		return false
